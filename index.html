@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cek Risiko Anemia</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #fefefe;
+      padding: 20px;
+      color: #333;
+    }
+    .container {
+      max-width: 500px;
+      margin: auto;
+      background: #fff;
+      padding: 30px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      border-radius: 10px;
+    }
+    h1 {
+      color: #c0392b;
+      text-align: center;
+    }
+    .question {
+      display: none;
+      opacity: 0;
+      transform: translateX(50px);
+      transition: all 0.5s ease;
+    }
+    .question.active {
+      display: block;
+      opacity: 1;
+      transform: translateX(0);
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    .options {
+      margin-top: 5px;
+    }
+    button {
+      background-color: #c0392b;
+      color: white;
+      padding: 10px 20px;
+      margin-top: 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 100%;
+    }
+    button:hover {
+      background-color: #a93226;
+    }
+    #hasil {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #f9f9f9;
+      border-left: 5px solid #c0392b;
+      border-radius: 5px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    .progress-bar {
+      width: 100%;
+      background-color: #eee;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .progress {
+      height: 10px;
+      width: 0%;
+      background-color: #c0392b;
+      transition: width 0.3s;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Cek Risiko Anemia</h1>
+
+  <div class="progress-bar">
+    <div class="progress" id="progress"></div>
+  </div>
+
+  <form id="anemiaForm">
+
+    <div class="question active" data-score="2">
+      <label>1. Apakah Anda sering merasa sangat lelah?</label>
+      <div class="options">
+        <input type="radio" name="q1" value="1" required> Ya
+        <input type="radio" name="q1" value="0"> Tidak
+      </div>
+    </div>
+
+    <div class="question" data-score="1">
+      <label>2. Apakah kulit Anda terlihat sangat pucat?</label>
+      <div class="options">
+        <input type="radio" name="q2" value="1" required> Ya
+        <input type="radio" name="q2" value="0"> Tidak
+      </div>
+    </div>
+
+    <div class="question" data-score="1">
+      <label>3. Apakah Anda sering mengalami pusing atau sakit kepala?</label>
+      <div class="options">
+        <input type="radio" name="q3" value="1" required> Ya
+        <input type="radio" name="q3" value="0"> Tidak
+      </div>
+    </div>
+
+    <div class="question" data-score="2">
+      <label>4. Apakah Anda sesak napas saat beraktivitas ringan?</label>
+      <div class="options">
+        <input type="radio" name="q4" value="1" required> Ya
+        <input type="radio" name="q4" value="0"> Tidak
+      </div>
+    </div>
+
+    <div class="question" data-score="3">
+      <label>5. Apakah jantung Anda sering berdebar cepat tanpa sebab?</label>
+      <div class="options">
+        <input type="radio" name="q5" value="1" required> Ya
+        <input type="radio" name="q5" value="0"> Tidak
+      </div>
+    </div>
+    <div class="question" data-score="2">
+        <label>6. Apakah Anda sering merasa sulit berkonsentrasi di kelas atau merasa mengantuk terus-menerus?</label>
+        <div class="options">
+          <input type="radio" name="q6" value="1" required> Ya
+          <input type="radio" name="q6" value="0"> Tidak
+        </div>
+      </div>
+      
+      <div class="question" data-score="2">
+        <label>7. Apakah Anda merasa sulit fokus?</label>
+        <div class="options">
+          <input type="radio" name="q7" value="1" required> Ya
+          <input type="radio" name="q7" value="0"> Tidak
+        </div>
+      </div>
+      
+      <div class="question" data-score="3">
+        <label>8. Apakah Anda merasa sering gemetar atau kedinginan?</label>
+        <div class="options">
+          <input type="radio" name="q8" value="1" required> Ya
+          <input type="radio" name="q8" value="0"> Tidak
+        </div>
+      </div>
+      
+      <div class="question" data-score="1">
+        <label>9. Apakah Anda mudah merasa sesak atau napas pendek?</label>
+        <div class="options">
+          <input type="radio" name="q9" value="1" required> Ya
+          <input type="radio" name="q9" value="0"> Tidak
+        </div>
+      </div>
+      
+      <div class="question" data-score="2">
+        <label>10. Apakah Anda sering merasa pusing saat berdiri?</label>
+        <div class="options">
+          <input type="radio" name="q10" value="1" required> Ya
+          <input type="radio" name="q10" value="0"> Tidak
+        </div>
+      </div>
+    <button type="button" id="nextBtn">Lanjut</button>
+
+  </form>
+
+  <div id="hasil" class="hidden"></div>
+  <button id="resetBtn" class="hidden">Mulai Ulang</button>
+
+</div>
+
+<script>
+  const questions = document.querySelectorAll('.question');
+  const progress = document.getElementById('progress');
+  const nextBtn = document.getElementById('nextBtn');
+  const hasilDiv = document.getElementById('hasil');
+  const resetBtn = document.getElementById('resetBtn');
+  let currentQuestion = 0;
+  let totalScore = 0;
+
+  function updateProgress() {
+    const percent = ((currentQuestion) / questions.length) * 100;
+    progress.style.width = percent + '%';
+  }
+
+  function tampilkanHasil() {
+    let hasil = "";
+    if (totalScore <= 2) {
+      hasil = "Risiko anemia Anda rendah. Tetap jaga pola makan sehat!";
+    } else if (totalScore <= 5) {
+      hasil = "Risiko anemia Anda sedang. Perbanyak konsumsi makanan kaya zat besi.";
+    } else {
+      hasil = "Risiko anemia Anda tinggi. Sebaiknya konsultasi ke dokter untuk pemeriksaan lebih lanjut.";
+    }
+
+    hasilDiv.innerText = hasil;
+    hasilDiv.classList.remove('hidden');
+    resetBtn.classList.remove('hidden');
+
+    // Simpan hasil ke LocalStorage
+    localStorage.setItem('hasilAnemia', hasil);
+  }
+
+  nextBtn.addEventListener('click', function() {
+    const current = questions[currentQuestion];
+    const selected = current.querySelector('input[type="radio"]:checked');
+    
+    if (!selected) {
+      alert('Silakan pilih jawaban terlebih dahulu.');
+      return;
+    }
+    
+    if (selected.value === "1") {
+      const score = parseInt(current.getAttribute('data-score'));
+      totalScore += score;
+    }
+
+    current.classList.remove('active');
+    currentQuestion++;
+
+    if (currentQuestion < questions.length) {
+      questions[currentQuestion].classList.add('active');
+      updateProgress();
+    } else {
+      // Semua pertanyaan selesai
+      document.getElementById('anemiaForm').style.display = 'none';
+      progress.style.width = '100%';
+      tampilkanHasil();
+    }
+  });
+
+  resetBtn.addEventListener('click', function() {
+    // Reset semua
+    currentQuestion = 0;
+    totalScore = 0;
+    hasilDiv.classList.add('hidden');
+    resetBtn.classList.add('hidden');
+    document.getElementById('anemiaForm').reset();
+    document.getElementById('anemiaForm').style.display = 'block';
+
+    questions.forEach(q => q.classList.remove('active'));
+    questions[0].classList.add('active');
+    updateProgress();
+
+    // Hapus hasil dari LocalStorage
+    localStorage.removeItem('hasilAnemia');
+  });
+
+  // Cek apakah ada hasil lama tersimpan
+  window.onload = function() {
+    const hasilTersimpan = localStorage.getItem('hasilAnemia');
+    if (hasilTersimpan) {
+      document.getElementById('anemiaForm').style.display = 'none';
+      hasilDiv.innerText = hasilTersimpan;
+      hasilDiv.classList.remove('hidden');
+      resetBtn.classList.remove('hidden');
+      progress.style.width = '100%';
+    }
+  };
+
+  updateProgress();
+</script>
+<!-- Tambahan footer -->
+<footer style="text-align: center; padding: 20px; font-weight: bold; color: #c0392b;">
+  <img src="logo.pikr.jpg" alt="Logo PIK-R Serviam" style="height: 50px; border-radius: 50%;" margin-bottom: 10px;"><br>
+  PIK-R Serviam Kotamobagu
+</footer>
+
+
+</body>
+</html>
